@@ -4,7 +4,7 @@ qgisMinimumVersion=3.22
 supportsQt6=yes
 description=Meridian gives AI assistants control of QGIS over the Model Context Protocol, via a localhost HTTP bridge that runs PyQGIS on the main thread.
 about=Meridian starts a small HTTP server bound to 127.0.0.1 inside QGIS and executes PyQGIS on the Qt main thread. Paired with the companion MCP server (shipped in the source repository), it lets an AI assistant such as Claude programmatically control QGIS: execute PyQGIS code, manage layers, run Processing algorithms, and render the map canvas to an image. SECURITY: this plugin enables arbitrary code execution by design. It binds to localhost only, refuses cross-origin (browser) requests, and supports an optional shared-secret token (QGIS_MCP_TOKEN). Use only with trusted, local MCP clients. Distributed via GitHub (Install from ZIP), not the official plugin repository.
-version=0.1.0
+version=0.1.1
 author=REAT Global
 email=dawit@reat-global.com
 tracker=https://github.com/STOKEDMODELLER/qgis-mcp-bridge/issues
@@ -17,9 +17,10 @@ experimental=True
 deprecated=False
 server=False
 hasProcessingProvider=no
-changelog=0.1.0
-    - Initial release as "Meridian".
-    - Localhost HTTP bridge that executes PyQGIS on the QGIS main thread.
-    - Endpoints: /ping, /execute (arbitrary PyQGIS), /render (canvas PNG).
+changelog=0.1.1
+    - Rebrand to "Meridian"; add plugin icon.
     - Hardening: cross-origin/Referer requests refused; optional QGIS_MCP_TOKEN shared secret.
-    - Menu toggle to start/stop the bridge; autostarts on load.
+    - Packaging: strip macOS metadata; include LICENSE in package.
+    0.1.0
+    - Initial release: localhost HTTP bridge that executes PyQGIS on the main thread.
+    - Endpoints: /ping, /execute (arbitrary PyQGIS), /render (canvas PNG).
