@@ -1,0 +1,9 @@
+[project]
+name = "qgis-mcp-server"
+version = "0.1.0"
+description = "MCP server bridging Claude to a running QGIS instance"
+requires-python = ">=3.10"
+dependencies = ["mcp[cli]>=1.2.0"]
+
+[project.scripts]
+qgis-mcp-server = "qgis_mcp_server:mcp.run"
