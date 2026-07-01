@@ -14,7 +14,9 @@ No third-party dependencies: only stdlib + PyQt + qgis, all present inside QGIS.
 import base64
 import io
 import json
+import os
 import queue
+import secrets
 import threading
 import traceback
 from contextlib import redirect_stdout
@@ -24,6 +26,9 @@ from qgis.PyQt.QtCore import QObject, QTimer
 
 DEFAULT_HOST = "127.0.0.1"
 DEFAULT_PORT = 9876
+# Optional shared secret. When the QGIS_MCP_TOKEN env var is set, every request
+# must carry a matching X-QGIS-MCP-Token header. Unset = open (localhost only).
+TOKEN_ENV = "QGIS_MCP_TOKEN"
 
 
 # --------------------------------------------------------------------------- #
@@ -200,13 +205,40 @@ def _make_handler(dispatcher: MainThreadDispatcher):
                 return {}
             return json.loads(self.rfile.read(length).decode("utf-8"))
 
+        def _authorized(self) -> bool:
+            """Reject browser-originated and unauthenticated requests.
+
+            This bridge executes arbitrary code, so we harden the localhost
+            surface against drive-by attacks: (1) any request carrying an
+            Origin or Referer header is refused — a legitimate MCP client does
+            not send those, but a malicious web page (incl. DNS-rebinding)
+            would; (2) when QGIS_MCP_TOKEN is set, an exact-match
+            X-QGIS-MCP-Token header is required.
+            """
+            if self.headers.get("Origin") or self.headers.get("Referer"):
+                self._send({"ok": False, "error": "forbidden: cross-origin"}, 403)
+                return False
+            token = os.environ.get(TOKEN_ENV, "").strip()
+            if token:
+                provided = (self.headers.get("X-QGIS-MCP-Token") or "").strip()
+                if not secrets.compare_digest(
+                    provided.encode("utf-8"), token.encode("utf-8")
+                ):
+                    self._send({"ok": False, "error": "forbidden: bad token"}, 403)
+                    return False
+            return True
+
         def do_GET(self):
+            if not self._authorized():
+                return
             if self.path == "/ping":
                 self._send(dispatcher.submit(qgis_info))
             else:
                 self._send({"ok": False, "error": "not found"}, 404)
 
         def do_POST(self):
+            if not self._authorized():
+                return
             try:
                 data = self._read_json()
             except Exception as exc:

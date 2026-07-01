@@ -28,9 +28,12 @@ mcp = FastMCP("qgis")
 def _request(method: str, path: str, payload: dict | None = None) -> dict:
     url = BRIDGE + path
     data = json.dumps(payload).encode("utf-8") if payload is not None else None
-    req = urllib.request.Request(
-        url, data=data, method=method, headers={"Content-Type": "application/json"}
-    )
+    headers = {"Content-Type": "application/json"}
+    # Match the plugin's optional shared-secret auth when configured.
+    token = os.environ.get("QGIS_MCP_TOKEN", "").strip()
+    if token:
+        headers["X-QGIS-MCP-Token"] = token
+    req = urllib.request.Request(url, data=data, method=method, headers=headers)
     try:
         with urllib.request.urlopen(req, timeout=TIMEOUT) as resp:
             return json.loads(resp.read().decode("utf-8"))
