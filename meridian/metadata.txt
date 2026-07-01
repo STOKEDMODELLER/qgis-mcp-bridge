@@ -1,0 +1,25 @@
+[general]
+name=Meridian
+qgisMinimumVersion=3.22
+supportsQt6=yes
+description=Control QGIS from AI assistants over the Model Context Protocol using a curated, safe set of commands — no arbitrary code execution.
+about=Meridian runs a small HTTP server bound to 127.0.0.1 inside QGIS and dispatches a fixed, reviewed set of commands to PyQGIS on the Qt main thread. Paired with the companion MCP server (in the source repository), it lets an AI assistant such as Claude operate QGIS through vetted operations: inspect the project, add/remove layers, read features, run named Processing algorithms, style, zoom, and render the map. There is no eval/exec — only specific handlers. The server binds to localhost only, refuses cross-origin (browser) requests, and supports an optional shared-secret token (QGIS_MCP_TOKEN).
+version=0.1.0
+author=REAT Global
+email=dawit@reat-global.com
+tracker=https://github.com/STOKEDMODELLER/qgis-mcp-bridge/issues
+repository=https://github.com/STOKEDMODELLER/qgis-mcp-bridge
+homepage=https://github.com/STOKEDMODELLER/qgis-mcp-bridge
+icon=icon.svg
+tags=python,mcp,ai,automation,processing,claude
+category=Plugins
+experimental=False
+deprecated=False
+server=False
+hasProcessingProvider=no
+changelog=0.1.0
+    - Initial release.
+    - Curated command bridge (no arbitrary code execution).
+    - Commands: project/layer inspection, add/remove layers, read features,
+      run named Processing algorithms, style/zoom/visibility, render canvas.
+    - Localhost only; cross-origin refused; optional QGIS_MCP_TOKEN shared secret.
